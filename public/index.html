@@ -16,7 +16,7 @@
             <h1>Tackle Project 3</h1>
         </header>
         <div class="button-container">
-            <button id="login" class="active">Login</button>
+            <button id="login" class="active shadow">Login</button>
             <button id="signup">New Account</button>
         </div>
         <div class="auth-container">
@@ -24,12 +24,15 @@
             <form method="POST">
                 <label for="email">Email</label>
                 <input type="email" name="email" id="email" autocorrect="off" spellcheck="false" autocapitalize="off"
-                    autofocus="autofocus" placeholder="e.g., arya.stark@mail.wi.wes" />
+                    autofocus="autofocus" placeholder="ex: email@email.com" />
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password" placeholder="e.g., ••••••••••••" />
+                <input type="password" name="password" id="password" placeholder="ex: ••••••••••••" />
                 <button id="submit" type="submit">Log In</button>
             </form>
         </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="/assets/js/home.js"></script>
 </body>
 
 </html>
