@@ -14,6 +14,7 @@ const $editCardDeleteButton = $("#edit-card .delete");
 const $contributorModalButton = $("#contributors");
 const $contributorModalInput = $("#contributor-email");
 const $contributorModalSaveButton = $("#contribute .save");
+const $contributorModalList = $("#contributors-content ul");
 
 init();
 
@@ -108,6 +109,17 @@ function renderBoard() {
 	$boardContainer.append($lists);
 
 	makeSortable();
+	renderContributors();
+}
+
+function renderContributors() {
+	let $contributorListItems = board.users.map(function (user) {
+		let $contributorListItem = $("<li>").text(user.email);
+		return $contributorListItem;
+	});
+
+	$contributorModalList.empty();
+	$contributorModalList.append($contributorListItems);
 }
 
 function makeSortable() {
@@ -326,6 +338,10 @@ function handleCardDelete(event) {
 	});
 }
 
+function displayMessage(msg, type = "hidden") {
+	$("#contribute .message").attr("class", `message ${type}`).text(msg);
+}
+
 function handleContributorSave(event) {
 	event.preventDefault();
 
@@ -333,8 +349,10 @@ function handleContributorSave(event) {
 
 	let contributorEmail = $contributorModalInput.val().trim().toLowerCase();
 
+	$contributorModalInput.val("");
+
 	if (!emailRegex.test(contributorEmail)) {
-		MicroModal.close("contribute");
+		displayMessage("Must provide a valid email address.", "danger");
 		return;
 	}
 
@@ -343,15 +361,45 @@ function handleContributorSave(event) {
 	});
 
 	if (contributor) {
-		MicroModal.close("contribute");
+		displayMessage(
+			`${contributorEmail} already has access to the board.`,
+			"danger"
+		);
 		return;
 	}
 
-	console.log("send request");
+	$.ajax({
+		url: "/api/user_boards",
+		method: "POST",
+		data: {
+			email: contributorEmail,
+			board_id: board.id,
+		},
+	})
+		.then(function () {
+			init();
+			displayMessage(
+				`Successfully added ${contributorEmail} to the board.`,
+				"success"
+			);
+		})
+		.catch(function () {
+			displayMessage(
+				`Cannot find user with email: ${contributorEmail}`,
+				"danger"
+			);
+		});
+}
+
+function openContributorModal() {
+	$contributorModalInput.val("");
+	displayMessage("");
+
+	MicroModal.show("contribute");
 }
 
 $contributorModalSaveButton.on("click", handleContributorSave);
-$contributorModalButton.on("click", MicroModal.show.bind(null, "contribute"));
+$contributorModalButton.on("click", openContributorModal);
 $saveListButton.on("click", handleListCreate);
 $logoutButton.on("click", handleLogout);
 $saveCardButton.on("click", handleCardCreate);
